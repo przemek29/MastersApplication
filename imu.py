@@ -1,13 +1,9 @@
 #!/usr/bin/python
-import time
-
 from adxl345 import ADXL345
 from l3g4200d import L3G4200D
 from hmc5883l import HMC5883L
 from bmp085 import BMP085
 from mpu6050 import MPU6050
-import smbus
-import timeit
 import math
 
 class IMU(object):
@@ -33,7 +29,7 @@ class IMU(object):
         self.accelerometer.read_raw_data()
         self.box.read_raw_data()
 	self.compass.read_raw_data()
-	
+	 
 	self.compass.set_offsets(9, -10, -140)
         
         self.gyro_scaled_x = round(self.gyroscope.read_scaled_gyro_x(),4)
@@ -65,15 +61,4 @@ class IMU(object):
         self.compass.set_offsets(x_offset, y_offset, z_offset)
 
 
-if __name__ == "__main__":
-
-    bus = smbus.SMBus(1)
-    imu_controller = IMU(bus, 0x69, 0x53, 0x1e, 0x68, "IMU")
-    counter = 0
-
-    while True:
-	data = imu_controller.read_all()
-	print str(counter) + "," + str(data) 
-	counter += 1
-	
  
