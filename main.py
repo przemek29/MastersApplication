@@ -1,12 +1,11 @@
+#!/usr/bin/python
 from imu import IMU
 from bmp085 import BMP085
 import smbus
 import math
 import serial
 
-#ser = serial.Serial(
-    #port='/dev/ttyAMA0',
-    #baudrate=115200,
+port = serial.Serial("/dev/ttyAMA0", baudrate=115200, timeout=3.0)
     #parity=serial.PARITY_SPACE,
     #stopbits=serial.STOPBITS_ONE,
     #bytesize=serial.SEVENBITS
@@ -31,7 +30,9 @@ if __name__ == "__main__":
    	    #pressure = barometer.read_pressure()
 	    #temperature = barometer.read_temperature()
 
-	print str(counter) + "," + str(imu_data)
+#	print str(counter) + "," + str(imu_data)
+        port.write(str(counter) + "," + str(imu_data) + "\r\n")
+
 	#print str(counter) + "," + str(imu_data) + "," + str(pressure) + "," + str(temperature) 
 	#print str(counter) + "," + str(pressure) + "," + str(temperature)
 	counter += 1
