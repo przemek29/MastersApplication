@@ -24,7 +24,6 @@ class IMU(object):
         self.read_all()
 
     def read_all(self):
-        '''Return pitch and roll in radians and the scaled x, y & z values from the gyroscope and accelerometer'''
         self.gyroscope.read_raw_data()
         self.accelerometer.read_raw_data()
         self.box.read_raw_data()
@@ -59,6 +58,3 @@ class IMU(object):
 
     def set_compass_offsets(self,x_offset, y_offset, z_offset):
         self.compass.set_offsets(x_offset, y_offset, z_offset)
-
-
- 

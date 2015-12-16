@@ -4,9 +4,7 @@ import math
 import i2cutils as I2CUtils
 
 class HMC5883L(object):
-    '''
-    Simple HMC5883L implementation
-    '''
+
     TWO_PI = 2 * math.pi
 
     CONF_REG_A = 0
@@ -48,7 +46,7 @@ class HMC5883L(object):
         self.y_offset = y_offset
         self.z_offset = z_offset
         
-	#wylacz hmc5883l jako slave i utworz polaczenie multimaster
+	#Turn off magnetometer as slave and create a connection as multimaster
 	I2CUtils.i2c_write_byte(self.bus, 0x68, 0x37, 0x32)
 	
         # Set the number of samples
@@ -68,9 +66,7 @@ class HMC5883L(object):
         self.read_raw_data()
     
     def read_raw_data(self):
-        '''
-        Read the raw data from the sensor, scale it appropriately and store for later use
-        '''
+
         self.raw_data = I2CUtils.i2c_read_block(self.bus, self.address, HMC5883L.DATA_START_BLOCK, 6)
         self.raw_x = I2CUtils.twos_compliment(self.raw_data[HMC5883L.DATA_XOUT_H], self.raw_data[HMC5883L.DATA_XOUT_L]) - self.x_offset
         self.raw_y = I2CUtils.twos_compliment(self.raw_data[HMC5883L.DATA_YOUT_H], self.raw_data[HMC5883L.DATA_YOUT_L]) - self.y_offset
@@ -84,59 +80,10 @@ class HMC5883L(object):
 	self.read_raw_data()
 	return str(self.scaled_x - 122) + "," + str(self.scaled_y + 34) + "," + str(self.scaled_z +484)
 
-    def read_bearing(self):
-        '''
-        Read a bearing from the sensor assuming the sensor is level
-        '''
-        self.read_raw_data()
-
-        bearing = math.atan2(self.read_scaled_y(), self.read_scaled_x())
-        if bearing < 0:
-            return bearing + (HMC5883L.TWO_PI)
-        else:
-            return bearing
-
-    def read_compensated_bearing(self, pitch, roll):
-        '''
-        Calculate a bearing taking in to account the current pitch and roll of the device as supplied as parameters
-        '''
-        self.read_raw_data()
-        cos_pitch = (math.cos(pitch))
-        sin_pitch = (math.sin(pitch))
-        
-        cos_roll = (math.cos(roll))
-        sin_roll = (math.sin(roll))
-    
-        Xh = (self.scaled_x * cos_roll) + (self.scaled_z * sin_roll)
-        Yh = (self.scaled_x * sin_pitch * sin_roll) + (self.scaled_y * cos_pitch) - (self.scaled_z * sin_pitch * cos_roll)
-        
-        bearing = math.atan2(Yh, Xh)
-        if bearing < 0:
-            return bearing + (HMC5883L.TWO_PI)
-        else:
-            return bearing
-    
     def set_offsets(self, x_offset, y_offset, z_offset):
         self.x_offset = x_offset
         self.y_offset = y_offset
         self.z_offset = z_offset
     
-    def read_raw_x(self):
-        return self.raw_x
-    
-    def read_raw_y(self):
-        return self.raw_y
-    
-    def read_raw_z(self):
-        return self.raw_z
-
-    def read_scaled_x(self):
-        return self.scaled_x
-
-    def read_scaled_y(self):
-        return self.scaled_y
-
-    def read_scaled_z(self):
-        return self.scaled_z
     
 

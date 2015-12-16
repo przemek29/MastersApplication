@@ -4,9 +4,6 @@ import smbus
 import i2cutils as I2CUtils
 
 class MPU6050(object):
-    '''
-    Simple MPU-6050 implementation
-    '''
 
     PWR_MGMT_1 = 0x6b
 
@@ -46,13 +43,8 @@ class MPU6050(object):
 
     GYRO_SCALE = { FS_250  : [ 250, 131.0], FS_500  : [ 500, 65.5], FS_1000 : [1000, 32.8], FS_2000 : [2000, 16.4] }
 
-    K = 0.98
-    K1 = 1 - K
 
     def __init__(self, bus, address, name, fs_scale=FS_250, afs_scale=AFS_2g):
-        '''
-        Constructor
-        '''
 
         self.bus = bus
         self.address = address
@@ -97,9 +89,7 @@ class MPU6050(object):
         I2CUtils.i2c_write_byte(self.bus, self.address, MPU6050.AFS_SEL, self.afs_scale << 3)
            
     def read_raw_data(self):
-        '''
-        Read the raw data from the sensor, scale it appropriately and store for later use
-        '''
+
         self.raw_gyro_data = I2CUtils.i2c_read_block(self.bus, self.address, MPU6050.GYRO_START_BLOCK, 6)
         self.raw_accel_data = I2CUtils.i2c_read_block(self.bus, self.address, MPU6050.ACCEL_START_BLOCK, 6)
         self.raw_temp_data = I2CUtils.i2c_read_block(self.bus, self.address, MPU6050.TEMP_START_BLOCK, 2)
@@ -127,92 +117,62 @@ class MPU6050(object):
         
         self.pitch = self.read_x_rotation(self.read_scaled_accel_x(),self.read_scaled_accel_y(),self.read_scaled_accel_z())
         self.roll =  self.read_y_rotation(self.read_scaled_accel_x(),self.read_scaled_accel_y(),self.read_scaled_accel_z())
-        
+            
     def distance(self, x, y):
-        '''Returns the distance between two point in 2d space'''
         return math.sqrt((x * x) + (y * y))
     
     def read_x_rotation(self, x, y, z):
-        '''Returns the rotation around the X axis in radians'''
         return math.atan2(y, self.distance(x, z))
     
     def read_y_rotation(self, x, y, z):
-        '''Returns the rotation around the Y axis in radians'''
         return -math.atan2(x, self.distance(y, z))
     
     def read_raw_accel_x(self):
-        '''Return the RAW X accelerometer value'''
         return self.accel_raw_x
         
     def read_raw_accel_y(self):
-        '''Return the RAW Y accelerometer value'''
         return self.accel_raw_y
         
     def read_raw_accel_z(self):
-        '''Return the RAW Z accelerometer value'''        
         return self.accel_raw_z
     
     def read_scaled_accel_x(self):
-        '''Return the SCALED X accelerometer value'''
         return self.accel_scaled_x
     
     def read_scaled_accel_y(self):
-        '''Return the SCALED Y accelerometer value'''
         return self.accel_scaled_y
 
     def read_scaled_accel_z(self):
-        '''Return the SCALED Z accelerometer value'''
         return self.accel_scaled_z
 
     def read_raw_gyro_x(self):
-        '''Return the RAW X gyro value'''
         return self.gyro_raw_x
         
     def read_raw_gyro_y(self):
-        '''Return the RAW Y gyro value'''
         return self.gyro_raw_y
         
     def read_raw_gyro_z(self):
-        '''Return the RAW Z gyro value'''
         return self.gyro_raw_z
     
     def read_scaled_gyro_x(self):
-        '''Return the SCALED X gyro value in radians/second'''
         return self.gyro_scaled_x
 
     def read_scaled_gyro_y(self):
-        '''Return the SCALED Y gyro value in radians/second'''
         return self.gyro_scaled_y
 
     def read_scaled_gyro_z(self):
-        '''Return the SCALED Z gyro value in radians/second'''
         return self.gyro_scaled_z
 
     def read_temp(self):
-        '''Return the temperature'''
         return self.scaled_temp
-    
+
     def read_pitch(self):
-        '''Return the current pitch value in radians'''
         return self.pitch
 
     def read_roll(self):
-        '''Return the current roll value in radians'''
-        self.roll
-        
+	return self.roll
+    
     def read_all(self):
-        '''Return pitch and roll in radians and the scaled x, y & z values from the gyroscope and accelerometer'''
         self.read_raw_data()
         return (self.pitch, self.roll, self.gyro_scaled_x, self.gyro_scaled_y, self.gyro_scaled_z, self.accel_scaled_x, self.accel_scaled_y, self.accel_scaled_z)
 
-
-if __name__ == "__main__":
-    bus = smbus.SMBus(1)#i2c_raspberry_pi_bus_number())
-    mpu = MPU6050(bus, 0x68, "mpu")
-    i = 0
-    
-    
-    while True:
-        data = mpu.read_all()
-        print str(i),data
-        i+=1

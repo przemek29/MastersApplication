@@ -4,10 +4,6 @@ import math
 import i2cutils as I2CUtils
 
 class L3G4200D(object):
-    '''
-    Simple L3G4200D implementation
-    Datasheet: http://www.st.com/web/catalog/sense_power/FM89/SC1288/PF250373
-    '''
 
     CTRL_REG1 = 0x20
     CTRL_REG2 = 0x21
@@ -35,9 +31,6 @@ class L3G4200D(object):
     GYRO_SCALE = { FS_250 : [FS_250_SCALE, 0], FS_500 : [FS_500_SCALE, 1], FS_2000 : [FS_2000_SCALE, 10] }
 
     def __init__(self, bus, address, name, fs_scale=FS_500):
-        '''
-        Constructor
-        '''
 
         self.bus = bus
         self.address = address
@@ -74,25 +67,19 @@ class L3G4200D(object):
         self.gyro_scaled_z = math.radians(self.gyro_raw_z * L3G4200D.GYRO_SCALE[self.fs_scale][0]) 
 
     def read_raw_gyro_x(self):
-        '''Return the RAW X gyro value'''
         return self.gyro_raw_x
         
     def read_raw_gyro_y(self):
-        '''Return the RAW Y gyro value'''
         return self.gyro_raw_y
         
     def read_raw_gyro_z(self):
-        '''Return the RAW Z gyro value'''
         return self.gyro_raw_z
     
     def read_scaled_gyro_x(self):
-        '''Return the SCALED X gyro value in radians/second'''
         return self.gyro_scaled_x
 
     def read_scaled_gyro_y(self):
-        '''Return the SCALED Y gyro value in radians/second'''
         return self.gyro_scaled_y
 
     def read_scaled_gyro_z(self):
-        '''Return the SCALED Z gyro value in radians/second'''
 	return self.gyro_scaled_z
